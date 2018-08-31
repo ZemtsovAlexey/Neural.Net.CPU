@@ -687,11 +687,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\git_my\\Neural.Net.CPU\\src\\Neural.Net.CPU\\Neural.Net.CPU.csproj",
+      "projectUniqueName": "C:\\git_my\\DocumentType.Teacher\\Neural.Net.CPU\\src\\Neural.Net.CPU\\Neural.Net.CPU.csproj",
       "projectName": "Neural.Net.CPU",
-      "projectPath": "C:\\git_my\\Neural.Net.CPU\\src\\Neural.Net.CPU\\Neural.Net.CPU.csproj",
+      "projectPath": "C:\\git_my\\DocumentType.Teacher\\Neural.Net.CPU\\src\\Neural.Net.CPU\\Neural.Net.CPU.csproj",
       "packagesPath": "C:\\Users\\zemtsov\\.nuget\\packages\\",
-      "outputPath": "C:\\git_my\\Neural.Net.CPU\\src\\Neural.Net.CPU\\obj\\",
+      "outputPath": "C:\\git_my\\DocumentType.Teacher\\Neural.Net.CPU\\src\\Neural.Net.CPU\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

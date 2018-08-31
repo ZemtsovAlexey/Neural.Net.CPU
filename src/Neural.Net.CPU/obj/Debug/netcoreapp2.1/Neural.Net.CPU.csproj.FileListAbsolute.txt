@@ -1,0 +1,9 @@
+C:\git_my\DocumentType.Teacher\Neural.Net.CPU\src\Neural.Net.CPU\bin\Debug\netcoreapp2.1\Neural.Net.CPU.deps.json
+C:\git_my\DocumentType.Teacher\Neural.Net.CPU\src\Neural.Net.CPU\bin\Debug\netcoreapp2.1\Neural.Net.CPU.dll
+C:\git_my\DocumentType.Teacher\Neural.Net.CPU\src\Neural.Net.CPU\bin\Debug\netcoreapp2.1\Neural.Net.CPU.pdb
+C:\git_my\DocumentType.Teacher\Neural.Net.CPU\src\Neural.Net.CPU\obj\Debug\netcoreapp2.1\Neural.Net.CPU.csprojAssemblyReference.cache
+C:\git_my\DocumentType.Teacher\Neural.Net.CPU\src\Neural.Net.CPU\obj\Debug\netcoreapp2.1\Neural.Net.CPU.csproj.CoreCompileInputs.cache
+C:\git_my\DocumentType.Teacher\Neural.Net.CPU\src\Neural.Net.CPU\obj\Debug\netcoreapp2.1\Neural.Net.CPU.AssemblyInfoInputs.cache
+C:\git_my\DocumentType.Teacher\Neural.Net.CPU\src\Neural.Net.CPU\obj\Debug\netcoreapp2.1\Neural.Net.CPU.AssemblyInfo.cs
+C:\git_my\DocumentType.Teacher\Neural.Net.CPU\src\Neural.Net.CPU\obj\Debug\netcoreapp2.1\Neural.Net.CPU.dll
+C:\git_my\DocumentType.Teacher\Neural.Net.CPU\src\Neural.Net.CPU\obj\Debug\netcoreapp2.1\Neural.Net.CPU.pdb

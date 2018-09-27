@@ -13,13 +13,13 @@ namespace Neural.Net.CPU.Networks
     public class Network
     {
         public ILayer[] Layers;
-        private int inputWidth;
-        private int inputHeight;
+        public int InputWidth { get; private set; }
+        public int InputHeight { get; private set; }
 
         public void InitLayers(int shapeX, int shapeY, params ILayer[] layers)
         {
-            inputWidth = shapeX;
-            inputHeight = shapeY;
+            InputWidth = shapeX;
+            InputHeight = shapeY;
             var neuronsCount = 0;
             Layers = new ILayer[layers.Length];
 
@@ -101,8 +101,8 @@ namespace Neural.Net.CPU.Networks
         {
             var data = new SaveNetworkModel
             {
-                InputWidth = inputWidth,
-                InputHeight = inputHeight,
+                InputWidth = InputWidth,
+                InputHeight = InputHeight,
                 Layers = new List<LayerSaveData>()
             };
 

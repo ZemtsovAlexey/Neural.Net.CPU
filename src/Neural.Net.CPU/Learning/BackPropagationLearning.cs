@@ -15,7 +15,7 @@ namespace Neural.Net.CPU.Learning
         private readonly Matrix[][] convNeuronErrors;
         private readonly IFullyConnectedLayer[] fullyConnectedLayers;
 
-        public double LearningRate { private get; set; } = 0.05f;
+        public double LearningRate { get; set; } = 0.05f;
 
         public BackPropagationLearning(Network network)
         {

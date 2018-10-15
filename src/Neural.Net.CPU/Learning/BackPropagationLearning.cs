@@ -128,11 +128,12 @@ namespace Neural.Net.CPU.Learning
 
                         Parallel.For(0, prevLayer.NeuronsCount, n =>
                         {
-                            // b[l-1] = f'(u[l-1]) * sum(b[l]) * rot180(k)
-                            prevB[n] = prevLayer.Outputs[n] * Eb.BackConvolution(layer.Neurons[n].Weights.Rot180());
+                            var fU = prevLayer is IConvolutionLayer convolutionLayer
+                                ? prevLayer.Outputs[n] * convolutionLayer.Neurons[n].Function.Derivative
+                                : prevLayer.Outputs[n];
 
-                            if (prevLayer is IConvolutionLayer convolutionLayer)
-                                prevB[n] *= convolutionLayer.Neurons[n].Function.Derivative;
+                            // b[l-1] = f'(u[l-1]) * sum(b[l]) * rot180(k)
+                            prevB[n] = (Eb.BackConvolution(layer.Neurons[n].Weights.Rot180())) * fU;
                         });
                         break;
                     }
@@ -161,10 +162,11 @@ namespace Neural.Net.CPU.Learning
                                 }
                             }
 
-                            prevB[n] *= prevLayer.Outputs[n];
+                            var fU = prevLayer is IConvolutionLayer convolutionLayer
+                                ? prevLayer.Outputs[n] * convolutionLayer.Neurons[n].Function.Derivative
+                                : prevLayer.Outputs[n];
 
-                            if (prevLayer is IConvolutionLayer convolutionLayer)
-                                prevB[n] *= convolutionLayer.Neurons[n].Function.Derivative;
+                            prevB[n] *= fU;
                         });
                         
                         break;
@@ -263,18 +265,19 @@ namespace Neural.Net.CPU.Learning
 
                 for (var e = 0; e < convNeuronErrors[l].Length; e++)
                 {
-                    var error = convNeuronErrors[l][e];
+                    var error = convNeuronErrors[l][e] * LearningRate * layer.Neurons[e].Function.Derivative;
                     var weights = layer.Neurons[e].Weights;
 
-                    layer.Neurons[e].Weights = weights + inputs.Convolution(error.Rot180() * LearningRate).Rot180();
+                    layer.Neurons[e].Weights = weights + (inputs.Rot180() * layer.Neurons[e].Function.Derivative).Convolution(error)/*.Rot180()*/;
+//                    layer.Neurons[e].Weights = weights - (inputs.Rot180() * layer.Neurons[e].Function.Derivative).Convolution(error);
                     layer.Neurons[e].Bias +=
                         layer.Neurons[e].Function is ActivationFunctions.BipolarSigmoid
                             ? 0
-                            : layer.Neurons[e].Function.Derivative(error.Sum()) * LearningRate;
+                            : error.Sum();
                 }
             });
 
-            var input = convLayers.Length > 0 ? convLayers.Last().Outputs.To1DArray() : matrix.To1DArray();
+            var input = convLayers.Length > 0 ? convLayers.Last().Outputs.To1DArray() : (new [] { matrix }).To1DArray();
             var layersCount = fullyConnectedLayers.Count();
 
             Parallel.For(0, layersCount, l =>

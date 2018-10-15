@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Neural.Net.CPU.Models
 {
@@ -220,6 +221,25 @@ namespace Neural.Net.CPU.Models
                 for (var y = 0; y < height; y++)
                 for (var x = 0; x < width; x++)
                     r[y * width + x] = v[(height - 1 - y) * width + (width - 1 - x)];
+
+            return new Matrix(result);
+        }
+        
+        public static unsafe Matrix Rot90(this Matrix input)
+        {
+            if (input.Value == null || input.Value.Length == 0)
+                return input;
+
+            var height = input.Value.GetLength(0);
+            var width = input.Value.GetLength(1);
+            var result = new double[width, height];
+            var resultHeight = input.Value.GetLength(0);
+            var resultWidth = input.Value.GetLength(1);
+
+            fixed (double* v = input.Value, r = result)
+                for (var y = 0; y < resultHeight; y++)
+                for (var x = 0; x < resultWidth; x++)
+                    r[y * resultWidth + x] = v[(height - 1 - x) * width + (y)];
 
             return new Matrix(result);
         }

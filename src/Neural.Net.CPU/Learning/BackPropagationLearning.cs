@@ -37,24 +37,27 @@ namespace Neural.Net.CPU.Learning
         public double Run(double[,] input, double[] output)
         {
 //            network.Compute(input);
-            CalculateFullyConnectedLayersError(output);
+            var error = CalculateFullyConnectedLayersError(output);
             CalculateConvLayersErrorParallel();
             UpdateWeightsParallel(new Matrix(input));
 
-            var lastErrors = fullyConnectedNeuronErrors.Last();
-
-            return lastErrors.Sum(x => Math.Abs(x)) / lastErrors.Length;
+            return error;
         }
         
-        private void CalculateFullyConnectedLayersError(IReadOnlyList<double> desiredOutput)
+        private double CalculateFullyConnectedLayersError(IReadOnlyList<double> desiredOutput)
         {
             var layer = fullyConnectedLayers[fullyConnectedLayers.Length - 1];
             var errors = fullyConnectedNeuronErrors[fullyConnectedLayers.Length - 1];
             var output = layer.Outputs;
+            var error = 0d;
             
             //расчитываем ошибку на последнем слое
             for (var i = 0; i < layer.NeuronsCount; i++)
-                errors[i] = (desiredOutput[i] - output[i]) * layer[i].Function.Derivative(layer[i].Output);
+            {
+                var e = desiredOutput[i] - output[i];
+                errors[i] = e * layer[i].Function.Derivative(layer[i].Output);
+                error += e * e;
+            }
 
             //расчитываем ошибку на скрытых слоях
             for (var j = fullyConnectedLayers.Length - 2; j >= 0; j--)
@@ -71,6 +74,8 @@ namespace Neural.Net.CPU.Learning
                     errors[i] = layer[i].Function.Derivative(layer[i].Output) * sum;
                 });
             }
+
+            return error;
         }
 
         private void CalculateConvLayersErrorParallel()
@@ -235,14 +240,11 @@ namespace Neural.Net.CPU.Learning
 
                 for (var e = 0; e < convNeuronErrors[l].Length; e++)
                 {
-                    var error = convNeuronErrors[l][e];
+                    var error = convNeuronErrors[l][e] * LearningRate;
                     var weights = layer.Neurons[e].Weights;
 
-                    layer.Neurons[e].Weights = weights + (inputs.Convolution(error/*.Rot180()*/) * LearningRate);
-                    layer.Neurons[e].Bias +=
-                        layer.Neurons[e].Function is ActivationFunctions.BipolarSigmoid
-                            ? 0
-                            : LearningRate * error.Sum();
+                    layer.Neurons[e].Weights = weights - inputs.Convolution(error/*.Rot180()*/);
+                    layer.Neurons[e].Bias -= error.Sum();
                 }
             });
 

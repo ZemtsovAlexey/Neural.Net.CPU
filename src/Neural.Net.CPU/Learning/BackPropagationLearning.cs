@@ -243,18 +243,20 @@ namespace Neural.Net.CPU.Learning
                     var error = convNeuronErrors[l][e] * LearningRate;
                     var weights = layer.Neurons[e].Weights;
 
-                    layer.Neurons[e].Weights = weights - inputs.Convolution(error/*.Rot180()*/);
+                    layer.Neurons[e].Weights = weights - inputs.Convolution(error.Rot180());
                     layer.Neurons[e].Bias -= error.Sum();
                 }
             });
 
             var input = convLayers.Length > 0 ? convLayers.Last().Outputs.To1DArray() : (new [] { matrix }).To1DArray();
             var layersCount = fullyConnectedLayers.Count();
+            var sumError = 0d;
 
             Parallel.For(0, layersCount, l =>
             {
                 var layer = fullyConnectedLayers[l];
                 var inputs = l == 0 ? input : fullyConnectedLayers[l - 1].Neurons.Select(x => x.Output).ToArray();
+                var bias = fullyConnectedNeuronErrors[l].Sum();
 
                 unsafe
                 {
@@ -264,9 +266,13 @@ namespace Neural.Net.CPU.Learning
                         var weightsLength = neuron.Weights.Length;
                         var error = fullyConnectedNeuronErrors[l][n];
 
+                        neuron.Bias += bias;
+
                         fixed (double* weights = neuron.Weights, x = inputs)
                             for (var i = 0; i < weightsLength; i++)
+                            {
                                 weights[i] += LearningRate * error * x[i];
+                            }
                     });
                 }
             });

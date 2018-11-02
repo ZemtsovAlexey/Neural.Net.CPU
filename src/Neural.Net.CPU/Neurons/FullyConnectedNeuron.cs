@@ -9,6 +9,7 @@ namespace Neural.Net.CPU.Neurons
         public double[] Weights { get; set; }
         public double Output { get; private set; }
         public IActivationFunction Function { get; }
+        public double Bias { get; set; } = 0;
         
         private static readonly Random Random = new Random((int) DateTime.Now.Ticks);
 
@@ -37,7 +38,7 @@ namespace Neural.Net.CPU.Neurons
                         e += w[n] * i[n];
             }
 
-            var output = Function.Activation(e);
+            var output = Function.Activation(e + Bias);
 
             Output = output;
 

@@ -33,7 +33,9 @@ namespace Neural.Net.CPU.Domain.Save
     [Serializable]
     internal class FullyConnectedNeuronSaveData
     {
-        public double[] Weights { get; set; } 
+        public double[] Weights { get; set; }
+
+        public double Bias { get; set; }
     }
     
     [Serializable]

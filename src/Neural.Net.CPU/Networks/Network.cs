@@ -135,7 +135,8 @@ namespace Neural.Net.CPU.Networks
                     
                             layerSaveData.FullyConnectedNeurons.Add(new FullyConnectedNeuronSaveData
                             {
-                                Weights = weights
+                                Weights = weights,
+                                Bias = neuron.Bias
                             });
                         }
 
@@ -242,6 +243,7 @@ namespace Neural.Net.CPU.Networks
                         for (var n = 0; n < layer.NeuronsCount; n++)
                         {
                             layer.Neurons[n].Weights = obj.Layers[l].FullyConnectedNeurons[n].Weights;
+                            layer.Neurons[n].Bias = obj.Layers[l].FullyConnectedNeurons[n].Bias;
                         }
                         
                         break;

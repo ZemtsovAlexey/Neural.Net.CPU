@@ -40,8 +40,11 @@ namespace Neural.Net.CPU.Networks
                 if (layers[i].Type == LayerType.Convolution)
                 {
                     var layer = (IConvolutionLayer) layers[i];
+                    var outsPerNeuron = neuronsCount > 0 ? layer.NeuronsCount / neuronsCount : (int?)0;
+
+                    outsPerNeuron = neuronsCount > 0 && outsPerNeuron > 0 && layer.NeuronsCount % neuronsCount > 0 ? outsPerNeuron + 1 : outsPerNeuron;
                     
-                    layer.Init(shapeX, shapeY);
+                    layer.Init(shapeX, shapeY, outsPerNeuron);
                     
                     inputLength = layer.OutputHeight * layer.OutputWidht * layer.NeuronsCount;
                     shapeX = layer.OutputWidht;

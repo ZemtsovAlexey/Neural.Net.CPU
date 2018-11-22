@@ -15,7 +15,7 @@ namespace Neural.Net.CPU.Learning
         private readonly Matrix[][] convNeuronErrors;
         private readonly IFullyConnectedLayer[] fullyConnectedLayers;
 
-        public double LearningRate { get; set; } = 0.05f;
+        public double LearningRate { get; set; } = 0.01f;
 
         public BackPropagationLearning(Network network)
         {
@@ -99,16 +99,26 @@ namespace Neural.Net.CPU.Learning
                     {
                         var layer = (IConvolutionLayer)convLayers[l];
                         var prevLayer = convLayers[l - 1];
-                        var Eb = b.Sum();
 
+                        // b[l-1] = f'(u[l-1]) * sum(b[l]) * rot180(k)
                         Parallel.For(0, prevLayer.NeuronsCount, n =>
                         {
                             var fU = prevLayer is IConvolutionLayer convolutionLayer
                                 ? prevLayer.Outputs[n] * convolutionLayer.Neurons[n].Function.Derivative
                                 : prevLayer.Outputs[n];
 
-                            // b[l-1] = f'(u[l-1]) * sum(b[l]) * rot180(k)
-                            prevB[n] = (Eb.BackConvolution(layer.Neurons[n].Weights.Rot180())) * fU;
+                            var error = new Matrix(new double[prevLayer.Outputs[n].GetLength(0),prevLayer.Outputs[n].GetLength(1)]);
+                            var neurons = layer.Neurons.Select((neuron, i) => new {neuron, index = i});
+                                
+                            if (layer.UseReferences)
+                                neurons = neurons.Where(x => x.neuron.ParentId == n).ToList();
+
+                            foreach (var neuron in neurons)
+                            {
+                                error += (b[neuron.index].BackConvolution(neuron.neuron.Weights.Rot180())) * fU;
+                            }
+                            
+                            prevB[n] = error;
                         });
                         break;
                     }
@@ -195,11 +205,13 @@ namespace Neural.Net.CPU.Learning
                     var layer = (IConvolutionLayer) convLayers[layerIndex];
 
                     Parallel.For(0, layer.NeuronsCount, nIndex =>
+//                    for (var nIndex = 0; nIndex < layer.NeuronsCount; nIndex++)
                     {
                         var outputHeight = layer.Neurons[nIndex].Output.GetLength(0);
                         var outputWidth = layer.Neurons[nIndex].Output.GetLength(1);
                         var outputs = layer.Neurons[nIndex].Output;
                         var activationFunction = layer.Neurons[nIndex].Function;
+                        var stride = nIndex * outputHeight * outputWidth;
 
                         convNeuronErrors[convLayers.Count - 1][nIndex] = new Matrix(new double[outputHeight, outputWidth]);
                         var errors = convNeuronErrors[convLayers.Count - 1][nIndex];
@@ -208,12 +220,12 @@ namespace Neural.Net.CPU.Learning
                         {
                             for (var x = 0; x < outputWidth; x++)
                             {
-                                var i = (nIndex * outputHeight * outputWidth) + (y * outputs.GetLength(1) + x);
+                                var i = stride + (y * outputWidth + x);
                                 var sum = fullyConnectedLayers[0].Neurons
                                     .Select((neuron, ni) => new {neuron, ni})
                                     .Sum(j => j.neuron.Weights[i] * fullyConnectedNeuronErrors[0][j.ni]);
 
-                                errors[x, y] = activationFunction.Derivative(outputs[y, x]) * sum;
+                                errors[y, x] = activationFunction.Derivative(outputs[y, x]) * sum;
                             }
                         }
                     });
